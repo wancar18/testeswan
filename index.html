@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>Tacadinha - Jogo de Sinuca Online</title>
+
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/reset.css?v=1771314864665">
+    <link rel="stylesheet" href="css/main.css?v=1771314864665">
+    <link rel="stylesheet" href="css/orientation_utils.css?v=1771314864665">
+    <link rel="stylesheet" href="css/ios_fullscreen.css?v=1771314864665">
+
+    <script src="lib/jquery-3.2.1.min.js?v=1771314864665"></script>
+    <script src="lib/easeljs-NEXT.min.js?v=1771314864665"></script>
+    <script src="lib/tweenjs.js?v=1771314864665"></script>
+    <script src="lib/howler.min.js?v=1771314864665"></script>
+    <script src="lib/screenfull.js?v=1771314864665"></script>
+    <script src="lib/platform.js?v=1771314864665"></script>
+    <script src="lib/ios_fullscreen.js?v=1771314864665"></script>
+    <script src="lib/three.min.js?v=1771314864665"></script>
+    <script src="lib/sprintf.min.js?v=1771314864665"></script>
+    <script src="lib/ctl_utils.js?v=1771314864665"></script>
+
+    <script src="lib/CLang.min.js?v=1771314864665"></script>
+    <script src="lib/sprite_lib.js?v=1771314864665"></script>
+    <script src="lib/settings.js?v=1771314864665"></script>
+    <script src="lib/logger.js?v=1771314864665"></script>
+    <script>
+        initializeGameLogger();
+    </script>
+    <script src="lib/CPreloader.js?v=1771314864665"></script>
+    <script src="lib/CVector2.js?v=1771314864665"></script>
+    <script src="lib/CMath.js?v=1771314864665"></script>
+    <script src="lib/CGfxButton.js?v=1771314864665"></script>
+    <script src="lib/CTextButton.js?v=1771314864665"></script>
+    <script src="lib/CToggle.js?v=1771314864665"></script>
+    <script src="lib/CMenu.js?v=1771314864665"></script>
+    <script src="lib/CDifficultyMenu.js?v=1771314864665"></script>
+    <script src="lib/CCreditsPanel.js?v=1771314864665"></script>
+    <script src="lib/CButLang.js?v=1771314864665"></script>
+    <script src="lib/CCTLText.js?v=1771314864665"></script>
+    <script src="lib/CLocalStorage.js?v=1771314864665"></script>
+    <script src="lib/CBall.js?v=1771314864665"></script>
+    <script src="lib/CEdge.js?v=1771314864665"></script>
+    <script src="lib/CStick.js?v=1771314864665"></script>
+    <script src="lib/shared-physics.bundle.js?v=1771314864665"></script>
+    <script>
+        if (typeof SharedPhysics !== 'undefined') {
+            Object.defineProperty(window, 'SharedPhysics', {
+                value: SharedPhysics,
+                writable: false,
+                configurable: false,
+                enumerable: false
+            });
+        }
+    </script>
+    <script src="lib/CPhysicsController.js?v=1771314864665"></script>
+    <script src="lib/CTable.js?v=1771314864665"></script>
+    <script src="lib/CScene.js?v=1771314864665"></script>
+    <script src="lib/CInterface.js?v=1771314864665"></script>
+    <script src="lib/CPlayerGUI.js?v=1771314864665"></script>
+    <script src="lib/CTimerGUI.js?v=1771314864665"></script>
+    <script src="lib/CScoreGUI.js?v=1771314864665"></script>
+    <script src="lib/CRollingScore.js?v=1771314864665"></script>
+    <script src="lib/CGUIExpandible.js?v=1771314864665"></script>
+    <script src="lib/CBallSpinGUI.js?v=1771314864665"></script>
+    <script src="lib/CEffectText.js?v=1771314864665"></script>
+    <script src="lib/CGameOverPanel.js?v=1771314864665"></script>
+    <script src="lib/CAreYouSurePanel.js?v=1771314864665"></script>
+    <script src="lib/CInputController.js?v=1771314864665"></script>
+    <script src="lib/CGame.js?v=1771314864665"></script>
+    <script src="lib/CShotPowerBar.js?v=1771314864665"></script>
+    <script src="lib/CHandBallDrag.js?v=1771314864665"></script>
+    <script src="lib/CInteractiveHelp.js?v=1771314864665"></script>
+    <script src="lib/CMultiplayerController.js?v=1771314864665"></script>
+    <script src="lib/CMain.js?v=1771314864665"></script>
+</head>
+
+<body ondragstart="return false;" ondrop="return false;">
+    <div style="position: fixed; background-color: transparent; top: 0px; left: 0px; width: 100%; height: 100%; pointer-events: none;"></div>
+
+    <div id="touch-fix" style="position: fixed; top: 0; right: 0; width: 1px; height: 1px; pointer-events: auto; z-index: 99999; opacity: 0;"></div>
+
+    <div id="canvas_container">
+        <canvas id="canvas_game" class="game_canvas" width="1920" height="1080"></canvas>
+        <canvas id="canvas_3d" class="game_canvas canvas_3d" width="1920" height="1080"></canvas>
+        <canvas id="canvas_upper_3d" class="game_canvas canvas_upper_3d" width="1920" height="1080"></canvas>
+    </div>
+
+    <div id="block_game">
+        <div id="block_game_msg"></div>
+    </div>
+
+    <div id="orientation_msg">
+        <div id="orientation_msg_cont">
+            <div id="orientation_icon"></div>
+            <div id="orientation_text"></div>
+        </div>
+    </div>
+
+    <div id="ios_fullscreen_cont" onclick="goToFullScreen()">
+        <div id="ios_fullscreen_msg">Toque para jogar</div>
+        <div id="ios_fs_icon"></div>
+    </div>
+
+    <script>
+        (function() {
+            var _protectedGlobals = [
+                's_oTable', 's_oGame', 's_oMultiplayerController',
+                's_oPhysicsController', 's_oMultiplayerConfig',
+                's_oMain', 's_oInterface', 's_oStage'
+            ];
+            _protectedGlobals.forEach(function(name) {
+                var _val = window[name];
+                try {
+                    delete window[name];
+                    Object.defineProperty(window, name, {
+                        get: function() {
+                            return _val;
+                        },
+                        set: function(v) {
+                            _val = v;
+                        },
+                        enumerable: false,
+                        configurable: false
+                    });
+                } catch (e) { /* skip if already locked */ }
+            });
+        })();
+    </script>
+
+    <script>
+        window.addEventListener('error', function(e) {
+            console.error('[Game iframe] Global error:', e.message, 'at', e.filename, ':', e.lineno);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('[Game iframe] Unhandled promise rejection:', e.reason);
+        });
+        var multiplayerConfig = null;
+        var gameInitialized = false;
+
+        console.log('[Game iframe] Registering message event listener');
+        window.addEventListener('message', function(event) {
+            var allowedOrigins = [window.location.origin];
+            if (allowedOrigins.indexOf(event.origin) === -1) {
+                console.warn('[Game iframe] Blocked message from unauthorized origin:', event.origin);
+                return;
+            }
+
+            if (event.data && event.data.type && !event.data.type.includes('STICK')) {
+                console.log('[Game iframe] Message received:', event.data.type);
+            }
+
+            if (!event.data) return;
+
+            switch (event.data.type) {
+                case 'INIT_MULTIPLAYER':
+                    multiplayerConfig = event.data.config;
+                    if (event.data._st && multiplayerConfig) {
+                        multiplayerConfig.sessionToken = event.data._st;
+                    }
+                    // FIX ISSUE-003: Send ACK back to parent so it stops retrying
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'INIT_ACK'
+                        }, window.location.origin);
+                        console.log('[Game iframe] Sent INIT_ACK to parent');
+                    }
+                    if (!gameInitialized) {
+                        initGame();
+                    } else {
+                        // FIX ISSUE-003: If game already initialized, update config
+                        // This handles late config arrival or retry from parent
+                        if (typeof s_oMultiplayerConfig !== 'undefined') {
+                            s_oMultiplayerConfig = multiplayerConfig;
+                            console.log('[Game iframe] Updated multiplayer config (game already initialized)');
+                        }
+                    }
+                    break;
+            }
+        });
+
+        function initGame() {
+            if (gameInitialized) {
+                console.log('[Game iframe] initGame called but already initialized');
+                return;
+            }
+            gameInitialized = true;
+            console.log('[Game iframe] initGame called, multiplayerConfig:', multiplayerConfig);
+
+            $(document).ready(function() {
+                var config = {
+                    audio_enable_on_startup: true,
+                    fullscreen: true,
+                    check_orientation: true,
+                    points_for_ball_pot: 20,
+                    points_for_fault: -40
+                };
+
+                if (multiplayerConfig) {
+                    config.multiplayer = multiplayerConfig;
+                    console.log('[Game iframe] Starting with multiplayer config');
+                } else {
+                    console.log('[Game iframe] Starting WITHOUT multiplayer config (menu mode)');
+                }
+
+                var oMain = new CMain(config);
+
+                if (isIOS()) {
+                    setTimeout(function() {
+                        sizeHandler();
+                    }, 200);
+                } else {
+                    sizeHandler();
+                }
+            });
+        }
+
+        // Auto-init if not in iframe
+        if (window.self === window.top) {
+            console.log('[Game iframe] Not in iframe, auto-init');
+            initGame();
+        } else {
+            console.log('[Game iframe] In iframe, waiting for INIT_MULTIPLAYER');
+            window.parent.postMessage({
+                type: 'IFRAME_READY'
+            }, window.location.origin);
+            console.log('[Game iframe] Sent IFRAME_READY to parent');
+        }
+    </script>
+
+    <!-- Orientation message for mobile devices -->
+    <div data-orientation="landscape" class="orientation-msg-container">
+        <!-- Decorações de fundo -->
+        <div class="orientation-bg-decoration decoration-1"></div>
+        <div class="orientation-bg-decoration decoration-2"></div>
+
+        <!-- Conteúdo principal -->
+        <div class="orientation-content">
+            <!-- Ícone de rotação animado -->
+            <div class="orientation-icon">
+                <svg class="phone-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="16" y="4" width="32" height="56" rx="4" ry="4" stroke-width="2.5"/>
+                    <line x1="28" y1="52" x2="36" y2="52" stroke-width="2.5"/>
+                    <circle cx="32" cy="10" r="1.5" fill="#f0c14b"/>
+                </svg>
+                <!-- Seta circular de rotação -->
+                <svg class="rotate-arrows" width="120" height="120" viewBox="0 0 120 120" style="position: absolute; top: -10px; left: -10px;">
+                    <path d="M100 60 A40 40 0 0 1 60 100" stroke="#f0c14b" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                    <polygon points="55,95 65,100 60,110" fill="#f0c14b"/>
+                </svg>
+            </div>
+
+            <!-- Título -->
+            <h2 class="orientation-title">Gire o Dispositivo</h2>
+
+            <!-- Mensagem -->
+            <p class="orientation-msg-text">
+                Para uma melhor experiência de jogo, coloque seu celular na posição horizontal (paisagem).
+            </p>
+        </div>
+
+        <!-- Aviso de navegador in-app -->
+        <div class="inapp-browser-warning" id="inapp-warning">
+            <svg class="inapp-warning-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <p class="inapp-warning-text">
+                Você está usando o navegador do <strong id="inapp-browser-name">Instagram/TikTok</strong>.<br> A rotação de tela pode não funcionar corretamente.
+            </p>
+            <button class="open-browser-btn" onclick="openInExternalBrowser()">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                </svg>
+                Abrir no Navegador
+            </button>
+            <p class="orientation-hint">Toque no botão acima ou copie o link e abra no navegador.</p>
+        </div>
+    </div>
+
+    <script>
+        // Detectar navegadores in-app (Instagram, TikTok, Facebook, etc.)
+        function detectInAppBrowser() {
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            ua = ua.toLowerCase();
+
+            var inAppBrowsers = {
+                'instagram': /instagram/i,
+                'tiktok': /tiktok|musical_ly|bytedance/i,
+                'facebook': /fb_iab|fbav|fban/i,
+                'twitter': /twitter/i,
+                'linkedin': /linkedin/i,
+                'snapchat': /snapchat/i,
+                'pinterest': /pinterest/i,
+                'telegram': /telegram/i,
+                'whatsapp': /whatsapp/i
+            };
+
+            for (var browser in inAppBrowsers) {
+                if (inAppBrowsers[browser].test(ua)) {
+                    return browser.charAt(0).toUpperCase() + browser.slice(1);
+                }
+            }
+
+            // Detecção genérica de WebView
+            if (/wv|webview/i.test(ua) || (ua.indexOf('android') > -1 && ua.indexOf('chrome') === -1)) {
+                return 'App';
+            }
+
+            return null;
+        }
+
+        // Abrir no navegador externo
+        function openInExternalBrowser() {
+            var currentUrl = 'https://tacadinha.com/';
+
+            var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            var isAndroid = /android/i.test(navigator.userAgent);
+
+            if (isAndroid) {
+                window.location.href = 'intent://' + currentUrl.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+            } else {
+                copyToClipboard(currentUrl);
+                alert('Link copiado! Cole no Safari ou Chrome para abrir o jogo.');
+            }
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+            } else {
+                var textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var inAppBrowser = detectInAppBrowser();
+
+            if (inAppBrowser) {
+                var warningEl = document.getElementById('inapp-warning');
+                var browserNameEl = document.getElementById('inapp-browser-name');
+
+                if (warningEl && browserNameEl) {
+                    browserNameEl.textContent = inAppBrowser;
+                    warningEl.classList.add('show');
+                    console.log('[Orientation] In-app browser detected:', inAppBrowser);
+                }
+            }
+        });
+    </script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"538b851fac404354b8ff303b0af96ea9","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
